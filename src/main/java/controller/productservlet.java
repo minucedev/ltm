@@ -23,6 +23,10 @@ public class productservlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null) {
             listProducts(request, response);
+        } else {
+            switch (action) {
+                case "showcomponent"-> Product(request, response);
+            }
         }
 
     }
@@ -39,5 +43,18 @@ public class productservlet extends HttpServlet {
         RequestDispatcher dispatcher = request.getRequestDispatcher("view/minuce-store.jsp");
         dispatcher.forward(request, response);
     }
+
+    private void Product(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<Product> products = productdao.getAllProduct();
+        request.setAttribute("products", products);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("view/admin/admin-dashboard.jsp");
+        dispatcher.forward(request, response);
+    }
+
+
+
+
+
+
 
 }

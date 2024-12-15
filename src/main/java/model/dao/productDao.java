@@ -35,6 +35,7 @@ public class productDao {
                 products.add(new Product(
                         rs.getInt("id"),
                         rs.getString("name"),
+                        rs.getInt("state"),
                         rs.getString("description"),
                         rs.getInt("price"),
                         rs.getString("image_url")

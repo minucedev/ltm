@@ -51,7 +51,7 @@ public class userservlet extends HttpServlet {
 
             // Chuyển hướng dựa trên vai trò
             if ("admin".equalsIgnoreCase(role)) {
-                response.sendRedirect("view/admin/admin-dashboard.jsp"); // Trang dành cho admin
+                response.sendRedirect("productservlet?action=showcomponent"); // Trang dành cho admin
             } else {
                 response.sendRedirect("productservlet"); // Trang dành cho user
             }
