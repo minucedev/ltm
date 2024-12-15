@@ -3,13 +3,15 @@ package model.bean;
 public class Product {
     private int id;
     private String name;
+    private int state;
     private String description;
     private int price;
     private String image;
 
-    public Product(int id, String name, String description, int price, String image) {
+    public Product(int id, String name, int state, String description, int price, String image) {
         this.id = id;
         this.name = name;
+        this.state = state;
         this.description = description;
         this.price = price;
         this.image = image;
@@ -29,6 +31,14 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
     public String getDescription() {
@@ -60,6 +70,7 @@ public class Product {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", state=" + state +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", image='" + image + '\'' +
