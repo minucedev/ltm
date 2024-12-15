@@ -43,12 +43,13 @@ public class userservlet extends HttpServlet {
 
         // Gọi phương thức checkLogin từ DAO để lấy vai trò
         String role = userdao.checkLogin(username, password);
+        int user_id = userdao.getuid(username);
 
         if (role != null) { // Kiểm tra nếu role không phải null (nghĩa là thông tin đăng nhập đúng)
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
             session.setAttribute("role", role); // Lưu vai trò vào session
-
+            session.setAttribute("uid", user_id);
             // Chuyển hướng dựa trên vai trò
             if ("admin".equalsIgnoreCase(role)) {
                 response.sendRedirect("productservlet?action=showcomponent"); // Trang dành cho admin
