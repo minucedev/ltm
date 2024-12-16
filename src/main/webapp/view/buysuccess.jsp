@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -20,7 +21,7 @@
                 <hr>
                 <p class="mb-0">Vui lòng kiểm tra email của bạn để biết thêm thông tin chi tiết về đơn hàng.</p>
             </div>
-            <a href="productservlet" class="btn btn-primary">Quay lại Trang Chủ</a>
+            <a href="${pageContext.request.contextPath}/productservlet" class="btn btn-primary">Quay lại Trang Chủ</a>
         </div>
     </div>
 </div>
