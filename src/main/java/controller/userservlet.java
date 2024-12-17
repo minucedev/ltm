@@ -23,6 +23,14 @@ public class userservlet extends HttpServlet {
         String action = request.getParameter("action");
         switch (action) {
             case "register" -> addForm(request, response);
+            case "logout" -> {
+                HttpSession session = request.getSession();
+                session.setAttribute("username", null);
+                session.setAttribute("role", null);
+                session.setAttribute("uid", null);
+                response.sendRedirect("view/login.jsp");
+            }
+            case "getinfo" -> getInfor(request, response);
         }
     }
 
@@ -58,14 +66,15 @@ public class userservlet extends HttpServlet {
             }
         } else {
             // Nếu thông tin đăng nhập sai, quay lại trang đăng nhập
-            response.sendRedirect("index.jsp?error=invalid_login");
+            request.setAttribute("error", "Incorrect account or password");
+            request.getRequestDispatcher("view/login.jsp").forward(request, response);
         }
     }
 
 
     //Register for user
     private void addForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendRedirect("view/register-form.jsp");
+        response.sendRedirect("view/login.jsp?type=register");
     }
 
     private void addUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -76,18 +85,40 @@ public class userservlet extends HttpServlet {
             User insertedUser = new User(0, username, password, "", email);
             boolean result = userdao.addUser(insertedUser);
             if (result) {
-                response.sendRedirect("index.jsp");
+                response.sendRedirect("view/login.jsp");
             } else {
-                request.setAttribute("errorMessage", "Thêm tài khoản thất bại.");
+                request.setAttribute("error", "Thêm tài khoản thất bại.");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("view/error.jsp");
                 dispatcher.forward(request, response);
             }
         } else {
-            request.setAttribute("errorMessage", "Username already exists. Please choose another one.");
-            request.getRequestDispatcher("view/register-form.jsp").forward(request, response);
+            request.setAttribute("error", "Username already exists. Please choose another one.");
+            request.getRequestDispatcher("view/login.jsp?type=register").forward(request, response);
         }
 
     }
+    private void getInfor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            String username = (String) session.getAttribute("username");
+            if (username != null) {
+                User user = userdao.getInfo(username);
+                if (user != null) {
+                    request.setAttribute("user", user);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("view/user-info.jsp");
+                    dispatcher.forward(request, response);
+                } else {
+                    response.sendRedirect("index.jsp?error=user_not_found");
+                }
+            } else {
+                response.sendRedirect("index.jsp?error=not_logged_in");
+            }
+        } else {
+            response.sendRedirect("index.jsp?error=not_logged_in");
+        }
+    }
+
 
 
 }

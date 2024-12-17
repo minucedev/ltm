@@ -159,6 +159,31 @@ public class productDao {
         return products;
     }
 
+    public List<Product> searchProductByName(String keyword) {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE name LIKE ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, "%" + keyword + "%");
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
     public static void main(String[] args) {
         productDao dao = new productDao();
         List<Product> products = dao.getAllProduct();

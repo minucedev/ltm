@@ -103,6 +103,28 @@ public class userDao {
             return false; // Trả về false nếu xảy ra lỗi
         }
     }
+
+    public User getInfo(String username) {
+        String sql = "Select username, email, role from users where username = ? ";
+        User user = null;
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+
     public static void main(String[] args) {
         userDao dao = new userDao();
         System.out.println(dao.checkLogin("john_doe", "hashed_password_1"));

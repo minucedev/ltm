@@ -1,38 +1,84 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Đăng nhập</title>
+    <link href="../asset/login.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../asset/login.js"></script>
+
+
+    <%
+        String error =(String) request.getAttribute("error");
+        String type = request.getParameter("type");
+        if(type == null ) type = "login";
+    %>
+
+
+
 </head>
 <body>
-<%
-    String error = (String) request.getAttribute("error");
-    if(error!=null){
-%>
-    <i><%=error%></i>
-<%
-    }
-%>
-<form action="${pageContext.request.contextPath}/userservlet" method="post">
+<div class="container">
+    <input type="hidden" id="pageType" value="<%= type %>" />
+    <div class="c1">
 
-    <label for="username">Username</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <!-- Nút cho hành động đăng nhập -->
-    <button type="submit" name="action" value="login">Login</button>
-    <br>
-</form>
-<form action="userservlet" method="get">
-    <!-- Nút cho hành động đăng ký -->
-    <button type="submit" name="action" value="register">Register</button>
-</form>
+        <div class="c11">
+            <h1 class="mainhead">MINUCE STORE</h1>
+            <p class="mainp">Fast foods</p>
+        </div>
+        <div id="left"><h1 class="s1class"><span>ĐĂNG</span><span class="su">NHẬP</span>
+        </h1></div>
+        <div id="right"><h1 class="s2class"><span>ĐĂNG</span><span class="su">KÝ</span></h1></div>
+    </div>
+    <div class="c2">
+        <form class="signup" action="${pageContext.request.contextPath}/userservlet" method="post">
+            <h1 class="signup1">ĐĂNG KÝ</h1>
+            <br><br><br><br>
+            <input name="username" type="text" placeholder="Username*" class="username" required/>
+
+            <input name="email" type="text" placeholder="Email*" class="username" required/>
+
+            <input name="password" type="password" placeholder="Password*" class="username" required/>
+
+            <button class="btn" type="submit" name="action" value="register">Đăng ký</button>
+            <br><br>
+
+            <%
+                if (error != null && !error.isEmpty() && "register".equals(type)) {
+                    out.println("<small class='error-message'>Lỗi: " + error + "</small>");
+
+                }
+
+            %>
+
+        </form>
+        <form class="signin" action="${pageContext.request.contextPath}/userservlet" method="post">
+
+            <h1 class="signup1">ĐĂNG NHẬP</h1>
+            <br><br><br><br>
+            <input name="username" type="text" placeholder="Username*" class="username" required/>
+
+            <input name="password" type="password" placeholder="Password*" class="username" required/>
+
+            <button class="btn" type="submit" name="action" value="login">Đăng nhập</button>
+            <br><br><br><br><br>
+
+            <%
+                if (error != null && !error.isEmpty() && "login".equals(type)) {
+                    out.println("<small class='error-message'>Lỗi: " + error + "</small>");
+
+                }
+            %>
+
+        </form>
+
+
+
+    </div>
+</div>
 </body>
 </html>
