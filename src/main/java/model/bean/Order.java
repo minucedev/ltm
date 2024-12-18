@@ -3,13 +3,22 @@ package model.bean;
 import java.sql.Timestamp;
 
 public class Order {
+    private int order_id;
     private int userId;
     private long totalPrice;
     private Timestamp orderDate; // Sử dụng Timestamp thay vì LocalDateTime
     private String status;
 
+
     // Constructor
     public Order(int userId, long totalPrice, Timestamp orderDate, String status) {
+        this.userId = userId;
+        this.totalPrice = totalPrice;
+        this.orderDate = orderDate;
+        this.status = status;
+    }
+    public Order(int order_id, int userId, long totalPrice, Timestamp orderDate, String status) {
+        this.order_id = order_id;
         this.userId = userId;
         this.totalPrice = totalPrice;
         this.orderDate = orderDate;
@@ -47,5 +56,9 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getOrder_id() {
+        return order_id;
     }
 }

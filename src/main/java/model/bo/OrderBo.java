@@ -6,7 +6,7 @@ import model.bean.Product;
 import model.dao.OrderDao;
 import model.dao.productDao;
 
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,15 @@ public class OrderBo {
         // Lấy thời gian hiện tại
         Timestamp currentDateTime = Timestamp.valueOf(LocalDateTime.now());
         Order order = new Order(userId, totalPrice, currentDateTime, "completed");
-
         return orderDAO.addOrderWithDetails(order, orderDetails);
+    }
+
+
+    public List<OrderDetail> getOrderDetails(int orderId) {
+        return orderDAO.getOrderDetails(orderId);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderDAO.getAllOrders();
     }
 }

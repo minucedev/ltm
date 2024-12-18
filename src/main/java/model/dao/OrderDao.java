@@ -2,8 +2,10 @@ package model.dao;
 
 import model.bean.Order;
 import model.bean.OrderDetail;
+import model.bean.Product;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDao {
@@ -103,5 +105,69 @@ public class OrderDao {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public List<OrderDetail> getOrderDetails(int orderId) {
+        List<OrderDetail> orderDetails = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT od.product_id, od.quantity, od.unit_price, p.id, p.name, p.state, p.description, p.price, p.image_url " +
+                             "FROM order_items od " +
+                             "JOIN products p ON od.product_id = p.id " +
+                             "WHERE od.order_id = ?")) {
+            preparedStatement.setInt(1, orderId);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                // Lấy thông tin sản phẩm
+                Product product = new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                );
+
+                // Tạo đối tượng OrderDetail
+                OrderDetail orderDetail = new OrderDetail(
+                        rs.getInt("product_id"),
+                        rs.getInt("quantity"),
+                        rs.getDouble("unit_price"),
+                        product
+                );
+
+                // Thêm vào danh sách orderDetails
+                orderDetails.add(orderDetail);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orderDetails;
+    }
+
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT * FROM orders")) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order(
+                        rs.getInt("id"),
+                        rs.getInt("user_id"),
+                        rs.getLong("total_price"),
+                        rs.getTimestamp("order_date"),
+                        rs.getString("status")
+                );
+
+                orders.add(order);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
     }
 }

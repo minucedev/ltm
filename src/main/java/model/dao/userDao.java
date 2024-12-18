@@ -3,6 +3,8 @@ package model.dao;
 import model.bean.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class userDao {
     private String jdbcURL = "jdbc:mysql://localhost:3307/fast_food";
@@ -124,9 +126,33 @@ public class userDao {
         return user;
     }
 
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT id, username, email, role FROM users";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
 
     public static void main(String[] args) {
         userDao dao = new userDao();
         System.out.println(dao.checkLogin("john_doe", "hashed_password_1"));
     }
+
+
 }

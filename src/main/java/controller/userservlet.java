@@ -4,18 +4,18 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import model.bean.User;
-import model.dao.userDao;
+import model.bo.userBO;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "userservlet", value = "/userservlet")
 public class userservlet extends HttpServlet {
-    private userDao userdao;
+    private userBO userbo;
 
     @Override
     public void init() throws ServletException {
-        userdao = new userDao();
+        userbo = new userBO();
     }
 
     @Override
@@ -31,6 +31,7 @@ public class userservlet extends HttpServlet {
                 response.sendRedirect("view/login.jsp");
             }
             case "getinfo" -> getInfor(request, response);
+            case "alluser" -> getAllUser(request, response);
         }
     }
 
@@ -50,8 +51,8 @@ public class userservlet extends HttpServlet {
         String password = request.getParameter("password");
 
         // Gọi phương thức checkLogin từ DAO để lấy vai trò
-        String role = userdao.checkLogin(username, password);
-        int user_id = userdao.getuid(username);
+        String role = userbo.checkLogin(username, password);
+        int user_id = userbo.getuid(username);
 
         if (role != null) { // Kiểm tra nếu role không phải null (nghĩa là thông tin đăng nhập đúng)
             HttpSession session = request.getSession();
@@ -81,9 +82,9 @@ public class userservlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
-        if (!userdao.checkExistUser(username)) {
+        if (!userbo.checkExistUser(username)) {
             User insertedUser = new User(0, username, password, "", email);
-            boolean result = userdao.addUser(insertedUser);
+            boolean result = userbo.addUser(insertedUser);
             if (result) {
                 response.sendRedirect("view/login.jsp");
             } else {
@@ -103,7 +104,7 @@ public class userservlet extends HttpServlet {
         if (session != null) {
             String username = (String) session.getAttribute("username");
             if (username != null) {
-                User user = userdao.getInfo(username);
+                User user = userbo.getInfo(username);
                 if (user != null) {
                     request.setAttribute("user", user);
                     RequestDispatcher dispatcher = request.getRequestDispatcher("view/user-info.jsp");
@@ -118,7 +119,16 @@ public class userservlet extends HttpServlet {
             response.sendRedirect("index.jsp?error=not_logged_in");
         }
     }
-
-
+    private void getAllUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        HttpSession session = request.getSession(false);
+        if (session == null || !"admin".equals(session.getAttribute("role")) ) {
+            response.sendRedirect("view/login.jsp");
+        } else{
+            List<User> userList = userbo.getAllUser();
+            request.setAttribute("userList", userList);
+            request.getRequestDispatcher("view/admin/listUser.jsp").forward(request, response);
+        }
+    }
 
 }

@@ -4,18 +4,18 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import model.bean.Product;
-import model.dao.productDao;
+import model.bo.productBo;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "productservlet", value = "/productservlet")
 public class productservlet extends HttpServlet {
-    private productDao productdao;
+    private productBo productbo;
 
     @Override
     public void init() throws ServletException {
-        productdao = new productDao();
+        productbo = new productBo();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class productservlet extends HttpServlet {
             request.setAttribute("isLoggedIn", true);
         } else request.setAttribute("isLoggedIn", false);
         String keyword = request.getParameter("keyword");
-        List<Product> products = productdao.searchProductByName(keyword);
+        List<Product> products = productbo.searchProductByName(keyword);
         request.setAttribute("products", products);
         request.setAttribute("keyword", keyword);
 
@@ -65,7 +65,7 @@ public class productservlet extends HttpServlet {
         if (session != null && "user".equals(session.getAttribute("role"))) {
             request.setAttribute("isLoggedIn", true);
         } else request.setAttribute("isLoggedIn", false);
-        List<Product> products = productdao.getAllProduct();
+        List<Product> products = productbo.getAllProductSelling();
         request.setAttribute("products", products);
         RequestDispatcher dispatcher = request.getRequestDispatcher("view/home.jsp");
         dispatcher.forward(request, response);
@@ -77,7 +77,7 @@ public class productservlet extends HttpServlet {
         if (session == null || !"admin".equals(session.getAttribute("role")) ) {
             response.sendRedirect("view/login.jsp");
         } else {
-            List<Product> products = productdao.getAllProduct();
+            List<Product> products = productbo.getAllProduct();
             request.setAttribute("products", products);
             RequestDispatcher dispatcher = request.getRequestDispatcher("view/admin/admin-dashboard.jsp");
             dispatcher.forward(request, response);
@@ -93,7 +93,7 @@ public class productservlet extends HttpServlet {
         } else {
             int id = Integer.parseInt(request.getParameter("id"));
             // Lấy thông tin sản phẩm để hiển thị
-            Product product = productdao.getProductById(id);
+            Product product = productbo.getProductById(id);
             if (product != null) {
                 request.setAttribute("product", product);
                 RequestDispatcher dispatcher = request.getRequestDispatcher("view/admin/confirm-delete.jsp");
@@ -113,7 +113,7 @@ public class productservlet extends HttpServlet {
             response.sendRedirect("view/login.jsp");
         } else {
             int id = Integer.parseInt(request.getParameter("id"));
-            productdao.updateStateProduct(id);
+            productbo.updateStateProduct(id);
             response.sendRedirect("productservlet?action=showcomponent");
         }
 
@@ -127,7 +127,7 @@ public class productservlet extends HttpServlet {
         } else {
             try {
                 int id = Integer.parseInt(request.getParameter("id"));
-                Product product = productdao.getProductById(id);
+                Product product = productbo.getProductById(id);
 
                 if (product != null) {
                     request.setAttribute("product", product);
@@ -161,7 +161,7 @@ public class productservlet extends HttpServlet {
                 // Tạo đối tượng sản phẩm mới
                 Product updatedProduct = new Product(id, name, state, description, price, image);
 
-                boolean result = productdao.updateProduct(updatedProduct);
+                boolean result = productbo.updateProduct(updatedProduct);
 
                 if (result) {
                     response.sendRedirect("productservlet?action=showcomponent");
@@ -207,7 +207,7 @@ public class productservlet extends HttpServlet {
                 Product newProduct = new Product(0, name, state, description, price,image); // Giả sử ID được tự động tăng
 
                 // Gọi DAO để thêm sản phẩm
-                boolean result = productdao.insertProduct(newProduct);
+                boolean result = productbo.insertProduct(newProduct);
 
                 // Điều hướng tùy vào kết quả
                 if (result) {

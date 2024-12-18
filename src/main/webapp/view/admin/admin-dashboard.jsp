@@ -7,73 +7,9 @@
     <title>Quản lý sản phẩm</title>
     <!-- Liên kết đến Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    <link href="../../asset/admin.css" rel="stylesheet">
 
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            background-color: #343a40;
-            display: flex;
-            justify-content: space-between;
-        }
-        .navbar-brand {
-            color: #fff;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-        }
-        .navbar-brand .logo {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-        .nav-link {
-            color: #fff;
-            font-size: 1rem;
-        }
-        h1 {
-            color: #343a40;
-            text-align: left;
-        }
-        .table thead th {
-            background-color: #343a40;
-            color: #fff;
-            text-align: center;
-        }
-        .table tbody td {
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            transform: scale(1.1);
-        }
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-        .btn-primary:focus {
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.5);
-        }
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        .container {
-            padding-top: 20px;
-        }
-    </style>
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark">
@@ -81,6 +17,8 @@
         <img class="logo" src="../asset/logo.png"> Minuce Store
     </a>
     <div class="navbar">
+        <a class="nav-link" href="/userservlet?action=alluser">Danh sách khách hàng</a>
+        <a class="nav-link" href="/OrderServlet">Lịch sử bán hàng</a>
         <a class="nav-link" href="userservlet?action=getinfo">Cá nhân</a>
         <a class="nav-link" href="userservlet?action=logout">Đăng xuất</a>
     </div>
@@ -95,7 +33,7 @@
         </form>
     </div>
     <!-- Bảng sản phẩm -->
-    <table class="table table-striped table-bordered">
+    <table class="table ">
         <thead class="thead-dark">
         <tr>
             <th>ID</th>

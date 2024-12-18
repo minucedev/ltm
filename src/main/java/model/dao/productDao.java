@@ -23,12 +23,35 @@ public class productDao {
         return connection;
     }
 
-    // Lấy danh sách sinh viên
+
     public List<Product> getAllProduct() {
         List<Product> products = new ArrayList<>();
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM products"
+             )) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    public List<Product> getAllProductSelling() {
+        List<Product> products = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT * FROM products WHERE state=1"
              )) {
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
@@ -161,7 +184,7 @@ public class productDao {
 
     public List<Product> searchProductByName(String keyword) {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT * FROM products WHERE name LIKE ?";
+        String sql = "SELECT * FROM products WHERE name LIKE ? AND state=1";
 
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
