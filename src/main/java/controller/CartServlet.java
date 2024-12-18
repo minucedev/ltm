@@ -75,10 +75,9 @@ public class CartServlet extends HttpServlet {
     private void purchase(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException, ServletException {
         Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
         int uid = Integer.parseInt(session.getAttribute("uid").toString()) ;
-        System.out.println(uid);
         _orderBo.addOrderWithDetails(uid, cart);
         cart.clear();
-        request.setAttribute("cart", cart);
+        session.setAttribute("cart", cart);
         response.sendRedirect("view/buysuccess.jsp");
     }
 
