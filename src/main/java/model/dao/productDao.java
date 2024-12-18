@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class productDao {
-    private String jdbcURL = "jdbc:mysql://localhost:3306/fast_food";
+    private String jdbcURL = "jdbc:mysql://localhost:3307/fast_food";
     private String jdbcUsername = "root";
-    private String jdbcPassword = "";
+    private String jdbcPassword = "admin";
 
     // Kết nối tới cơ sở dữ liệu
     protected Connection getConnection() {
@@ -23,12 +23,35 @@ public class productDao {
         return connection;
     }
 
-    // Lấy danh sách sản phẩm
+
     public List<Product> getAllProduct() {
         List<Product> products = new ArrayList<>();
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM products"
+             )) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    public List<Product> getAllProductSelling() {
+        List<Product> products = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT * FROM products WHERE state=1"
              )) {
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
@@ -135,9 +158,60 @@ public class productDao {
         }
     }
 
+    public List<Product> getProductsByIds(String keyString) {
+        String query = "SELECT * FROM products WHERE id IN (" + keyString + ")";
+        List<Product> products = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     query
+             )) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    public List<Product> searchProductByName(String keyword) {
+        List<Product> products = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE name LIKE ? AND state=1";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, "%" + keyword + "%");
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                products.add(new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("state"),
+                        rs.getString("description"),
+                        rs.getInt("price"),
+                        rs.getString("image_url")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
     public static void main(String[] args) {
         productDao dao = new productDao();
-        Product product = new Product(1, "test", 1, "Delicious beef burger with lettuce and tomato", 50000, "https://th.bing.com/th/id/OIP.QGmd5LmQMD1fz5f1Rri5IwHaFj?w=1250&h=938&rs=1&pid=ImgDetMain");
-        System.out.println(dao.insertProduct(product));
+        List<Product> products = dao.getAllProduct();
+        for (Product product : products) {
+            System.out.println(product);
+        }
     }
 }

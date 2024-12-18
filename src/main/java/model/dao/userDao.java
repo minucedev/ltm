@@ -3,11 +3,13 @@ package model.dao;
 import model.bean.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class userDao {
-    private String jdbcURL = "jdbc:mysql://localhost:3306/fast_food";
+    private String jdbcURL = "jdbc:mysql://localhost:3307/fast_food";
     private String jdbcUsername = "root";
-    private String jdbcPassword = "";
+    private String jdbcPassword = "admin";
 
     // Kết nối tới cơ sở dữ liệu
     protected Connection getConnection() {
@@ -40,6 +42,25 @@ public class userDao {
             e.printStackTrace();
         }
         return role; // Trả về vai trò hoặc null nếu không tìm thấy
+    }
+
+    public int getuid(String username) {
+        int user_id = -1;
+        String sql = "SELECT id FROM users WHERE username = ?";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                user_id = rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            // Xử lý ngoại lệ một cách chính xác
+            e.printStackTrace();
+        }
+        return user_id;
     }
 
 
@@ -84,8 +105,54 @@ public class userDao {
             return false; // Trả về false nếu xảy ra lỗi
         }
     }
+
+    public User getInfo(String username) {
+        String sql = "Select username, email, role from users where username = ? ";
+        User user = null;
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, username);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                user = new User();
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT id, username, email, role FROM users";
+
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+
     public static void main(String[] args) {
         userDao dao = new userDao();
         System.out.println(dao.checkLogin("john_doe", "hashed_password_1"));
     }
+
+
 }

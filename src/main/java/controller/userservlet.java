@@ -4,18 +4,18 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import model.bean.User;
-import model.dao.userDao;
+import model.bo.userBO;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "userservlet", value = "/userservlet")
 public class userservlet extends HttpServlet {
-    private userDao userdao;
+    private userBO userbo;
 
     @Override
     public void init() throws ServletException {
-        userdao = new userDao();
+        userbo = new userBO();
     }
 
     @Override
@@ -23,6 +23,15 @@ public class userservlet extends HttpServlet {
         String action = request.getParameter("action");
         switch (action) {
             case "register" -> addForm(request, response);
+            case "logout" -> {
+                HttpSession session = request.getSession();
+                session.setAttribute("username", null);
+                session.setAttribute("role", null);
+                session.setAttribute("uid", null);
+                response.sendRedirect("view/login.jsp");
+            }
+            case "getinfo" -> getInfor(request, response);
+            case "alluser" -> getAllUser(request, response);
         }
     }
 
@@ -42,13 +51,14 @@ public class userservlet extends HttpServlet {
         String password = request.getParameter("password");
 
         // Gọi phương thức checkLogin từ DAO để lấy vai trò
-        String role = userdao.checkLogin(username, password);
+        String role = userbo.checkLogin(username, password);
+        int user_id = userbo.getuid(username);
 
         if (role != null) { // Kiểm tra nếu role không phải null (nghĩa là thông tin đăng nhập đúng)
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
             session.setAttribute("role", role); // Lưu vai trò vào session
-
+            session.setAttribute("uid", user_id);
             // Chuyển hướng dựa trên vai trò
             if ("admin".equalsIgnoreCase(role)) {
                 response.sendRedirect("productservlet?action=showcomponent"); // Trang dành cho admin
@@ -57,36 +67,68 @@ public class userservlet extends HttpServlet {
             }
         } else {
             // Nếu thông tin đăng nhập sai, quay lại trang đăng nhập
-            response.sendRedirect("index.jsp?error=invalid_login");
+            request.setAttribute("error", "Incorrect account or password");
+            request.getRequestDispatcher("view/login.jsp").forward(request, response);
         }
     }
 
 
     //Register for user
     private void addForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendRedirect("view/register-form.jsp");
+        response.sendRedirect("view/login.jsp?type=register");
     }
 
     private void addUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
-        if (!userdao.checkExistUser(username)) {
+        if (!userbo.checkExistUser(username)) {
             User insertedUser = new User(0, username, password, "", email);
-            boolean result = userdao.addUser(insertedUser);
+            boolean result = userbo.addUser(insertedUser);
             if (result) {
-                response.sendRedirect("index.jsp");
+                response.sendRedirect("view/login.jsp");
             } else {
-                request.setAttribute("errorMessage", "Thêm tài khoản thất bại.");
+                request.setAttribute("error", "Thêm tài khoản thất bại.");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("view/error.jsp");
                 dispatcher.forward(request, response);
             }
         } else {
-            request.setAttribute("errorMessage", "Username already exists. Please choose another one.");
-            request.getRequestDispatcher("view/register-form.jsp").forward(request, response);
+            request.setAttribute("error", "Username already exists. Please choose another one.");
+            request.getRequestDispatcher("view/login.jsp?type=register").forward(request, response);
         }
 
     }
+    private void getInfor(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
 
+        if (session != null) {
+            String username = (String) session.getAttribute("username");
+            if (username != null) {
+                User user = userbo.getInfo(username);
+                if (user != null) {
+                    request.setAttribute("user", user);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("view/user-info.jsp");
+                    dispatcher.forward(request, response);
+                } else {
+                    response.sendRedirect("index.jsp?error=user_not_found");
+                }
+            } else {
+                response.sendRedirect("index.jsp?error=not_logged_in");
+            }
+        } else {
+            response.sendRedirect("index.jsp?error=not_logged_in");
+        }
+    }
+    private void getAllUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        HttpSession session = request.getSession(false);
+        if (session == null || !"admin".equals(session.getAttribute("role")) ) {
+            response.sendRedirect("view/login.jsp");
+        } else{
+            List<User> userList = userbo.getAllUser();
+            request.setAttribute("userList", userList);
+            request.getRequestDispatcher("view/admin/listUser.jsp").forward(request, response);
+        }
+    }
 
 }
