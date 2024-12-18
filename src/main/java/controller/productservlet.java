@@ -76,10 +76,7 @@ public class productservlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null || !"admin".equals(session.getAttribute("role")) ) {
             response.sendRedirect("view/login.jsp");
-            System.out.println("1");
         } else {
-            System.out.println("2");
-
             List<Product> products = productdao.getAllProduct();
             request.setAttribute("products", products);
             RequestDispatcher dispatcher = request.getRequestDispatcher("view/admin/admin-dashboard.jsp");

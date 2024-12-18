@@ -71,7 +71,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Xác nhận xóa sản phẩm</h1>
+    <h1 class="mb-4">Xác nhận ngưng bán sản phẩm</h1>
 
     <c:if test="${not empty errorMessage}">
         <div class="error">${errorMessage}</div>
@@ -87,7 +87,7 @@
 
         <form action="productservlet?action=delete" method="post" onsubmit="return confirmDelete()">
             <input type="hidden" name="id" value="${product.id}" />
-            <button type="submit" class="btn btn-danger">Xóa</button>
+            <button type="submit" class="btn btn-danger">Ngưng bán</button>
             <button type="button" class="btn btn-secondary" onclick="goBack()">Hủy</button>
         </form>
     </c:if>
@@ -104,7 +104,7 @@
     }
 
     function confirmDelete() {
-        return confirm("Bạn có chắc chắn muốn xóa sản phẩm này?"); // Hiển thị xác nhận xóa
+        return confirm("Bạn có chắc chắn muốn ngưng bán sản phẩm này?"); // Hiển thị xác nhận xóa
     }
 </script>
 </body>

@@ -116,7 +116,7 @@
                 <td>${product.price}</td>
                 <td>
                     <a href="productservlet?action=update&id=${product.id}" class="btn btn-warning btn-sm">Sửa</a>
-                    <a href="productservlet?action=delete&id=${product.id}" class="btn btn-danger btn-sm">Xóa</a>
+                    <a href="productservlet?action=delete&id=${product.id}" class="btn btn-danger btn-sm">Ngưng bán</a>
                 </td>
             </tr>
         </c:forEach>
